@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyStream - Movies & Shows</title>
+    <!-- Tailwind CSS CDN for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter for a modern look -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles to enhance the Tailwind defaults and provide a Netflix-like feel */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #141414; /* Dark background similar to streaming services */
+            color: #e0e0e0; /* Light text for contrast */
+        }
+        /* Custom scrollbar for movie rows */
+        .scroll-container::-webkit-scrollbar {
+            height: 8px;
+        }
+        .scroll-container::-webkit-scrollbar-thumb {
+            background-color: #4a4a4a; /* Darker grey thumb */
+            border-radius: 4px;
+        }
+        .scroll-container::-webkit-scrollbar-track {
+            background-color: #2a2a2a; /* Even darker grey track */
+        }
+        /* Modal for video playback */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top of everything */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if content is too large */
+            background-color: rgba(0,0,0,0.9); /* Black background with transparency */
+            justify-content: center; /* Center content horizontally */
+            align-items: center; /* Center content vertically */
+        }
+        .modal-content {
+            background-color: #1e1e1e; /* Slightly lighter dark background for the modal */
+            margin: auto; /* Center the modal content */
+            padding: 20px;
+            border-radius: 12px; /* Rounded corners for the modal */
+            width: 90%; /* Responsive width */
+            max-width: 800px; /* Max width for larger screens */
+            box-shadow: 0 8px 30px rgba(0,0,0,0.6); /* Soft shadow for depth */
+            position: relative;
+            transform: translateY(-50px); /* Initial position for slide-in animation */
+            animation: slideIn 0.3s forwards ease-out; /* Slide-in animation */
+        }
+        /* Keyframe animation for modal entry */
+        @keyframes slideIn {
+            to {
+                transform: translateY(0);
+            }
+        }
+        /* Close button for the modal */
+        .close-button {
+            color: #aaa; /* Light grey color */
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: white; /* White on hover/focus */
+            text-decoration: none;
+            cursor: pointer;
+        }
+        /* Container for the video player to maintain aspect ratio */
+        .video-player-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio (height / width = 9 / 16 = 0.5625) */
+            height: 0;
+            overflow: hidden;
+            background-color: black;
+            border-radius: 8px; /* Rounded corners for the video player */
+        }
+        .video-player-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Header Section -->
+    <header class="bg-black bg-opacity-70 p-4 flex flex-col md:flex-row justify-between items-center fixed top-0 left-0 w-full z-50 shadow-lg">
+        <div class="flex items-center space-x-4 mb-4 md:mb-0">
+            <!-- MyStream Logo -->
+            <h1 class="text-red-600 text-3xl font-bold">MyStream</h1>
+            <!-- Navigation Links (hidden on small screens, shown on medium and up) -->
+            <nav class="hidden md:flex space-x-6 text-lg">
+                <a href="#" class="text-gray-300 hover:text-white transition duration-300">Home</a>
+                <a href="#" class="text-gray-300 hover:text-white transition duration-300">TV Shows</a>
+                <a href="#" class="text-gray-300 hover:text-white transition duration-300">Movies</a>
+                <a href="#" class="text-gray-300 hover:text-white transition duration-300">New & Popular</a>
+                <a href="#" class="text-gray-300 hover:text-white transition duration-300">My List</a>
+            </nav>
+        </div>
+        <div class="flex items-center space-x-4 w-full md:w-auto justify-end">
+            <!-- Search Input with Icon -->
+            <div class="relative w-full md:w-auto">
+                <input type="text" id="search-input" placeholder="Search..." class="bg-gray-800 text-white rounded-full py-2 px-4 pl-10 focus:outline-none focus:ring-2 focus:ring-red-600 transition duration-300 w-full">
+                <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </div>
+            <!-- Sign In Button -->
+            <button class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 flex-shrink-0">Sign In</button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow pt-20 p-6">
+        <!-- Featured Movie Section -->
+        <section id="featured-section" class="relative h-96 md:h-[500px] bg-cover bg-center rounded-xl shadow-xl overflow-hidden mb-12" style="background-image: url('https://placehold.co/1200x500/000000/FFFFFF?text=Featured+Movie+Placeholder');">
+            <!-- Gradient overlay for better text readability -->
+            <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+            <div class="absolute bottom-0 left-0 p-8 text-white">
+                <h2 class="text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg">Featured Movie Title</h2>
+                <p class="text-lg md:text-xl max-w-2xl mb-6 drop-shadow-lg">A brief, exciting description of the featured movie. Watch now for free!</p>
+                <!-- Play Now Button for the featured movie -->
+                <button class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition duration-300 transform hover:scale-105" onclick="playMovie('featured-movie-id')">
+                    <!-- Play icon -->
+                    <svg class="inline-block mr-2" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="20" height="20"><path d="M8 5v14l11-7z"></path></svg>
+                    Play Now
+                </button>
+            </div>
+        </section>
+
+        <!-- Movie Categories Section - Dynamically populated by JavaScript -->
+        <section id="movie-listings" class="space-y-10">
+            <!-- Movie categories and cards will be injected here -->
+        </section>
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="bg-black bg-opacity-70 p-6 text-center text-gray-400 mt-12">
+        <p>&copy; 2025 MyStream. All rights reserved. This is a demonstration website with placeholder content.</p>
+        <div class="flex justify-center space-x-6 mt-4">
+            <a href="#" class="hover:text-white transition duration-300">Privacy Policy</a>
+            <a href="#" class="hover:text-white transition duration-300">Terms of Service</a>
+            <a href="#" class="hover:text-white transition duration-300">Contact Us</a>
+        </div>
+    </footer>
+
+    <!-- Video Playback Modal -->
+    <div id="videoModal" class="modal">
+        <div class="modal-content">
+            <!-- Close button for the modal -->
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <h3 id="modal-movie-title" class="text-2xl font-bold mb-4 text-white"></h3>
+            <div class="video-player-container">
+                <!-- HTML5 Video Player -->
+                <video id="movie-player" controls autoplay class="w-full h-full rounded-lg">
+                    <!-- Placeholder video source (Big Buck Bunny - royalty-free) -->
+                    <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+            <p class="text-sm text-gray-400 mt-4">Note: This is a placeholder video for demonstration purposes. Actual movie content is not hosted here.</p>
+        </div>
+    </div>
+
+    <script>
+        // Array of movie objects with placeholder data
+        const movies = [
+            {
+                id: 'movie1',
+                title: 'The Great Adventure',
+                thumbnail: 'https://placehold.co/300x170/FF0000/FFFFFF?text=Adventure',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+                description: 'Join an epic journey across mystical lands to find a hidden treasure. Full of suspense and wonder!',
+                genre: 'Action & Adventure'
+            },
+            {
+                id: 'movie2',
+                title: 'Comedy Central Live',
+                thumbnail: 'https://placehold.co/300x170/00FF00/FFFFFF?text=Comedy',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+                description: 'Laugh out loud with the funniest stand-up comedians in this exclusive special.',
+                genre: 'Comedy'
+            },
+            {
+                id: 'movie3',
+                title: 'Mystery of the Old House',
+                thumbnail: 'https://placehold.co/300x170/0000FF/FFFFFF?text=Mystery',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+                description: 'A detective unravels the dark secrets hidden within an abandoned mansion.',
+                genre: 'Thriller'
+            },
+            {
+                id: 'movie4',
+                title: 'Sci-Fi Odyssey',
+                thumbnail: 'https://placehold.co/300x170/FFFF00/000000?text=Sci-Fi',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+                description: 'Explore distant galaxies and encounter alien civilizations in this stunning space opera.',
+                genre: 'Science Fiction'
+            },
+            {
+                id: 'movie5',
+                title: 'Romantic Getaway',
+                thumbnail: 'https://placehold.co/300x170/FF00FF/FFFFFF?text=Romance',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+                description: 'A heartwarming story of two strangers finding love in an unexpected paradise.',
+                genre: 'Romance'
+            },
+            {
+                id: 'movie6',
+                title: 'Historical Drama',
+                thumbnail: 'https://placehold.co/300x170/00FFFF/000000?text=Drama',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+                description: 'Relive pivotal moments in history through the eyes of those who lived them.',
+                genre: 'Drama'
+            },
+            {
+                id: 'movie7',
+                title: 'Kids Fun Time',
+                thumbnail: 'https://placehold.co/300x170/FFA500/FFFFFF?text=Kids',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+                description: 'Animated adventures and educational content for the whole family.',
+                genre: 'Kids & Family'
+            },
+            {
+                id: 'movie8',
+                title: 'Documentary: Wild Earth',
+                thumbnail: 'https://placehold.co/300x170/800080/FFFFFF?text=Documentary',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+                description: 'Discover the breathtaking beauty and fragile ecosystems of our planet.',
+                genre: 'Documentary'
+            },
+            {
+                id: 'movie9',
+                title: 'Fantasy Realm',
+                thumbnail: 'https://placehold.co/300x170/4B0082/FFFFFF?text=Fantasy',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+                description: 'Enter a world of magic, mythical creatures, and ancient prophecies.',
+                genre: 'Fantasy'
+            },
+            {
+                id: 'movie10',
+                title: 'Horror Night',
+                thumbnail: 'https://placehold.co/300x170/8B0000/FFFFFF?text=Horror',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+                description: 'A terrifying tale that will keep you on the edge of your seat.',
+                genre: 'Horror'
+            },
+            {
+                id: 'movie11',
+                title: 'Action Thriller',
+                thumbnail: 'https://placehold.co/300x170/FF4500/FFFFFF?text=Action',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+                description: 'High-octane chases and intense action sequences.',
+                genre: 'Action & Adventure'
+            },
+            {
+                id: 'movie12',
+                title: 'Stand-Up Special',
+                thumbnail: 'https://placehold.co/300x170/32CD32/FFFFFF?text=Comedy',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+                description: 'A hilarious new comedy special from a rising star.',
+                genre: 'Comedy'
+            },
+            {
+                id: 'movie13',
+                title: 'Psychological Thriller',
+                thumbnail: 'https://placehold.co/300x170/4169E1/FFFFFF?text=Thriller',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+                description: 'Mind-bending twists and turns that will leave you questioning everything.',
+                genre: 'Thriller'
+            },
+            {
+                id: 'movie14',
+                title: 'Space Exploration',
+                thumbnail: 'https://placehold.co/300x170/DAA520/000000?text=Space',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+                description: 'Humanity\'s first mission to a distant exoplanet.',
+                genre: 'Science Fiction'
+            },
+            {
+                id: 'movie15',
+                title: 'Sweet Romance',
+                thumbnail: 'https://placehold.co/300x170/FF69B4/FFFFFF?text=Love',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+                description: 'A charming story about finding love in unexpected places.',
+                genre: 'Romance'
+            },
+            {
+                id: 'movie16',
+                title: 'Biographical Drama',
+                thumbnail: 'https://placehold.co/300x170/20B2AA/FFFFFF?text=Bio',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+                description: 'The true story of an influential figure who changed the world.',
+                genre: 'Drama'
+            },
+            {
+                id: 'movie17',
+                title: 'Animated Shorts',
+                thumbnail: 'https://placehold.co/300x170/ADFF2F/000000?text=Cartoons',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+                description: 'A collection of delightful animated short films for all ages.',
+                genre: 'Kids & Family'
+            },
+            {
+                id: 'movie18',
+                title: 'Nature\'s Wonders',
+                thumbnail: 'https://placehold.co/300x170/5F9EA0/FFFFFF?text=Nature',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+                description: 'An immersive look at the most incredible natural phenomena.',
+                genre: 'Documentary'
+            },
+            {
+                id: 'movie19',
+                title: 'Epic Fantasy',
+                thumbnail: 'https://placehold.co/300x170/9932CC/FFFFFF?text=Magic',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+                description: 'A grand adventure in a land filled with magic and ancient evils.',
+                genre: 'Fantasy'
+            },
+            {
+                id: 'movie20',
+                title: 'Supernatural Horror',
+                thumbnail: 'https://placehold.co/300x170/DC143C/FFFFFF?text=Spooky',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+                description: 'Unexplained occurrences terrorize a small town.',
+                genre: 'Horror'
+            }
+        ];
+
+        // Object to group movies by genre
+        const movieCategories = {};
+
+        // Distribute movies into categories
+        movies.forEach(movie => {
+            if (!movieCategories[movie.genre]) {
+                movieCategories[movie.genre] = [];
+            }
+            movieCategories[movie.genre].push(movie);
+        });
+
+        // Get DOM elements
+        const movieListingContainer = document.getElementById('movie-listings');
+        const searchInput = document.getElementById('search-input');
+        const videoModal = document.getElementById('videoModal');
+        const modalMovieTitle = document.getElementById('modal-movie-title');
+        const moviePlayer = document.getElementById('movie-player');
+
+        /**
+         * Renders movie listings on the page, grouped by genre.
+         * Can filter movies based on a search term.
+         * @param {Array} filteredMovies - The array of movies to render. Defaults to all movies.
+         */
+        function renderMovies(filteredMovies = movies) {
+            movieListingContainer.innerHTML = ''; // Clear previous listings
+
+            // Create a temporary object to hold movies by category for the current render
+            const categoriesToRender = {};
+            filteredMovies.forEach(movie => {
+                if (!categoriesToRender[movie.genre]) {
+                    categoriesToRender[movie.genre] = [];
+                }
+                categoriesToRender[movie.genre].push(movie);
+            });
+
+            // Iterate through categories and create sections
+            for (const genre in categoriesToRender) {
+                if (categoriesToRender[genre].length > 0) {
+                    const categorySection = document.createElement('div');
+                    categorySection.className = 'mb-8'; // Margin bottom for spacing between categories
+                    categorySection.innerHTML = `
+                        <h3 class="text-2xl md:text-3xl font-bold mb-4 text-white">${genre}</h3>
+                        <div class="flex overflow-x-auto space-x-4 pb-4 scroll-container">
+                            ${categoriesToRender[genre].map(movie => `
+                                <div class="flex-none w-48 md:w-56 bg-gray-800 rounded-lg shadow-lg overflow-hidden cursor-pointer transform hover:scale-105 transition duration-300" onclick="playMovie('${movie.id}')">
+                                    <img src="${movie.thumbnail}" alt="${movie.title}" class="w-full h-auto object-cover rounded-t-lg">
+                                    <div class="p-3">
+                                        <h4 class="text-lg font-semibold text-white truncate">${movie.title}</h4>
+                                        <p class="text-sm text-gray-400 mt-1">${movie.description.substring(0, 50)}...</p>
+                                        <button class="mt-3 bg-red-600 hover:bg-red-700 text-white text-sm font-bold py-1.5 px-3 rounded-md w-full transition duration-300">Play</button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    movieListingContainer.appendChild(categorySection);
+                }
+            }
+
+            // Display message if no movies are found after filtering
+            if (filteredMovies.length === 0) {
+                movieListingContainer.innerHTML = '<p class="text-center text-gray-400 text-xl">No movies found matching your search criteria.</p>';
+            }
+        }
+
+        // Event listener for search input
+        searchInput.addEventListener('keyup', (event) => {
+            const searchTerm = event.target.value.toLowerCase();
+            const filteredMovies = movies.filter(movie =>
+                movie.title.toLowerCase().includes(searchTerm) ||
+                movie.description.toLowerCase().includes(searchTerm) ||
+                movie.genre.toLowerCase().includes(searchTerm)
+            );
+            renderMovies(filteredMovies); // Re-render movies based on search term
+        });
+
+        /**
+         * Opens the video modal and plays the selected movie.
+         * @param {string} movieId - The ID of the movie to play.
+         */
+        function playMovie(movieId) {
+            const movie = movies.find(m => m.id === movieId);
+            if (movie) {
+                modalMovieTitle.textContent = movie.title;
+                moviePlayer.src = movie.videoUrl;
+                videoModal.style.display = 'flex'; // Show the modal (using flex for centering)
+                moviePlayer.load(); // Load the new video source
+                moviePlayer.play(); // Autoplay the video
+            } else {
+                console.error('Movie not found with ID:', movieId);
+                // In a real application, you might display a user-friendly error message here.
+            }
+        }
+
+        /**
+         * Closes the video modal and pauses the video.
+         */
+        function closeModal() {
+            moviePlayer.pause(); // Pause the video
+            videoModal.style.display = 'none'; // Hide the modal
+        }
+
+        // Close modal when clicking outside of the modal content
+        window.onclick = function(event) {
+            if (event.target == videoModal) {
+                closeModal();
+            }
+        }
+
+        // Initial render of movies when the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            renderMovies();
+        });
+    </script>
+</body>
+</html>
