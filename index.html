@@ -90,84 +90,6 @@
             width: 100%;
             height: 100%;
         }
-
-        /* Message Box styles */
-        .message-box {
-            display: none; /* Hidden by default */
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: #333;
-            color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            z-index: 1001;
-            text-align: center;
-        }
-        .message-box button {
-            background-color: #red-600;
-            color: white;
-            padding: 8px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 15px;
-        }
-        /* Active navigation link style */
-        .active-nav {
-            color: white;
-            font-weight: bold;
-        }
-
-        /* Movie card hover effect */
-        .movie-card-content {
-            position: relative;
-            z-index: 1; /* Ensure content is above overlay */
-        }
-
-        .movie-card:hover .movie-details-overlay {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .movie-details-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            transform: translateY(100%); /* Start off-screen below */
-            border-radius: 8px; /* Match card border-radius */
-            padding: 10px;
-            text-align: center;
-            box-sizing: border-box;
-        }
-
-        .movie-details-overlay h4 {
-            font-size: 1.125rem; /* text-lg */
-            font-weight: 600; /* font-semibold */
-            margin-bottom: 0.5rem;
-        }
-
-        .movie-details-overlay p {
-            font-size: 0.875rem; /* text-sm */
-            color: #a0a0a0;
-            margin-bottom: 1rem;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: -webkit-box;
-            -webkit-line-clamp: 3; /* Limit description to 3 lines */
-            -webkit-box-orient: vertical;
-        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -177,13 +99,13 @@
         <div class="flex items-center space-x-4 mb-4 md:mb-0">
             <!-- MyStream Logo -->
             <h1 class="text-red-600 text-3xl font-bold">MyStream</h1>
-            <!-- Navigation Links (now filter categories on single page) -->
+            <!-- Navigation Links (hidden on small screens, shown on medium and up) -->
             <nav class="hidden md:flex space-x-6 text-lg">
-                <a href="#" id="nav-home" class="text-gray-300 hover:text-white transition duration-300 active-nav" data-filter-type="all">Home</a>
-                <a href="#" id="nav-tvshows" class="text-gray-300 hover:text-white transition duration-300" data-filter-type="tv_show">TV Shows</a>
-                <a href="#" id="nav-movies" class="text-gray-300 hover:text-white transition duration-300" data-filter-type="movie">Movies</a>
-                <a href="#" id="nav-newpopular" class="text-gray-300 hover:text-white transition duration-300" data-filter-type="new_popular">New & Popular</a>
-                <a href="#" id="nav-mylist" class="text-gray-300 hover:text-white transition duration-300" data-filter-type="mylist">My List</a>
+                <a href="#" class="text-gray-300 hover:text-white transition duration-300">Home</a>
+                <a href="#" class="text-gray-300 hover:text-white transition duration-300">TV Shows</a>
+                <a href="#" class="text-gray-300 hover:text-white transition duration-300">Movies</a>
+                <a href="#" class="text-gray-300 hover:text-white transition duration-300">New & Popular</a>
+                <a href="#" class="text-gray-300 hover:text-white transition duration-300">My List</a>
             </nav>
         </div>
         <div class="flex items-center space-x-4 w-full md:w-auto justify-end">
@@ -192,26 +114,22 @@
                 <input type="text" id="search-input" placeholder="Search..." class="bg-gray-800 text-white rounded-full py-2 px-4 pl-10 focus:outline-none focus:ring-2 focus:ring-red-600 transition duration-300 w-full">
                 <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
             </div>
-            <!-- User Info / Sign In Button -->
-            <div id="auth-status" class="flex items-center space-x-2">
-                <span id="user-display" class="text-white text-sm hidden"></span>
-                <button id="sign-in-button" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 flex-shrink-0" onclick="openAuthModal()">Sign In</button>
-                <button id="sign-out-button" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 flex-shrink-0 hidden" onclick="signOutUser()">Sign Out</button>
-            </div>
+            <!-- Sign In Button -->
+            <button class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 flex-shrink-0">Sign In</button>
         </div>
     </header>
 
     <!-- Main Content Area -->
     <main class="flex-grow pt-20 p-6">
         <!-- Featured Movie Section -->
-        <section id="featured-section" class="relative h-96 md:h-[500px] bg-cover bg-center rounded-xl shadow-xl overflow-hidden mb-12" style="background-image: url('https://source.unsplash.com/random/1200x500/?movie,action,epic');">
+        <section id="featured-section" class="relative h-96 md:h-[500px] bg-cover bg-center rounded-xl shadow-xl overflow-hidden mb-12" style="background-image: url('https://placehold.co/1200x500/000000/FFFFFF?text=Featured+Movie+Placeholder');">
             <!-- Gradient overlay for better text readability -->
             <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
             <div class="absolute bottom-0 left-0 p-8 text-white">
-                <h2 class="text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg">The Grand Adventure</h2>
-                <p class="text-lg md:text-xl max-w-2xl mb-6 drop-shadow-lg">Embark on a thrilling quest filled with danger and discovery. Watch now!</p>
+                <h2 class="text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg">Featured Movie Title</h2>
+                <p class="text-lg md:text-xl max-w-2xl mb-6 drop-shadow-lg">A brief, exciting description of the featured movie. Watch now for free!</p>
                 <!-- Play Now Button for the featured movie -->
-                <button class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition duration-300 transform hover:scale-105" onclick="playMovie('movie1')">
+                <button class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition duration-300 transform hover:scale-105" onclick="playMovie('featured-movie-id')">
                     <!-- Play icon -->
                     <svg class="inline-block mr-2" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="20" height="20"><path d="M8 5v14l11-7z"></path></svg>
                     Play Now
@@ -219,7 +137,7 @@
             </div>
         </section>
 
-        <!-- Dynamic Movie Listings Section -->
+        <!-- Movie Categories Section - Dynamically populated by JavaScript -->
         <section id="movie-listings" class="space-y-10">
             <!-- Movie categories and cards will be injected here -->
         </section>
@@ -253,550 +171,181 @@
         </div>
     </div>
 
-    <!-- Authentication Modal -->
-    <div id="authModal" class="modal">
-        <div class="modal-content max-w-md">
-            <span class="close-button" onclick="closeAuthModal()">&times;</span>
-            <h3 class="text-2xl font-bold mb-6 text-white text-center">Sign In / Sign Up</h3>
-            <input type="email" id="auth-email" placeholder="Email" class="w-full p-3 mb-4 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600">
-            <input type="password" id="auth-password" placeholder="Password" class="w-full p-3 mb-6 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-red-600">
-            <button class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg shadow-md w-full mb-4 transition duration-300" onclick="signInWithEmail()">Sign In</button>
-            <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md w-full mb-4 transition duration-300" onclick="signUpWithEmail()">Sign Up</button>
-            <div class="text-center text-gray-400 my-4">OR</div>
-            <button class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg shadow-md w-full transition duration-300" onclick="signInAnonymouslyUser()">Continue as Guest</button>
-        </div>
-    </div>
-
-    <!-- Message Box -->
-    <div id="messageBox" class="message-box">
-        <p id="messageText"></p>
-        <button onclick="closeMessageBox()">OK</button>
-    </div>
-
-    <script type="module">
-        // Firebase imports
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Global Firebase variables (provided by Canvas environment)
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-        // Initialize Firebase
-        let app;
-        let db;
-        let auth;
-        let userId = null; // To store the current user's ID
-
-        // Initialize Firebase only if config is available
-        if (Object.keys(firebaseConfig).length > 0) {
-            app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-            auth = getAuth(app);
-
-            // Firebase Auth State Listener
-            onAuthStateChanged(auth, async (user) => {
-                const userDisplay = document.getElementById('user-display');
-                const signInButton = document.getElementById('sign-in-button');
-                const signOutButton = document.getElementById('sign-out-button');
-
-                if (user) {
-                    userId = user.uid;
-                    userDisplay.textContent = `Welcome, ${user.email || 'Guest'}! (ID: ${userId})`;
-                    userDisplay.classList.remove('hidden');
-                    signInButton.classList.add('hidden');
-                    signOutButton.classList.remove('hidden');
-                    console.log("User is signed in:", user.uid);
-
-                    // Optional: Store user profile in Firestore upon first sign-in/sign-up
-                    const userProfileRef = doc(db, `artifacts/${appId}/users/${userId}/user_profiles/profile`);
-                    const docSnap = await getDoc(userProfileRef);
-                    if (!docSnap.exists()) {
-                        await setDoc(userProfileRef, {
-                            uid: userId,
-                            email: user.email || 'guest',
-                            createdAt: new Date().toISOString()
-                        });
-                        console.log("User profile created/updated in Firestore.");
-                    }
-
-                } else {
-                    userId = null;
-                    userDisplay.classList.add('hidden');
-                    signInButton.classList.remove('hidden');
-                    signOutButton.classList.add('hidden');
-                    console.log("No user is signed in.");
-                }
-            });
-
-            // Attempt initial sign-in with custom token or anonymously
-            window.addEventListener('DOMContentLoaded', async () => {
-                try {
-                    if (initialAuthToken) {
-                        await signInWithCustomToken(auth, initialAuthToken);
-                        console.log("Signed in with custom token.");
-                    } else {
-                        await signInAnonymously(auth);
-                        console.log("Signed in anonymously.");
-                    }
-                } catch (error) {
-                    console.error("Firebase initial sign-in error:", error);
-                    showMessageBox(`Authentication Error: ${error.message}`);
-                }
-            });
-
-        } else {
-            console.warn("Firebase configuration not found. Authentication features will be disabled.");
-            showMessageBox("Firebase is not configured. Authentication features are disabled.");
-        }
-
-
+    <script>
         // Array of movie objects with placeholder data
         const movies = [
             {
                 id: 'movie1',
-                title: 'The Grand Adventure',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?adventure,fantasy,epic',
+                title: 'The Great Adventure',
+                thumbnail: 'https://placehold.co/300x170/FF0000/FFFFFF?text=Adventure',
                 videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
                 description: 'Join an epic journey across mystical lands to find a hidden treasure. Full of suspense and wonder!',
-                genre: 'Action & Adventure',
-                type: 'movie',
-                isNew: true,
-                isPopular: true
+                genre: 'Action & Adventure'
             },
             {
                 id: 'movie2',
-                title: 'Stand-Up Comedy Special',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?comedy,standup,funny',
-                videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', // Another royalty-free video
+                title: 'Comedy Central Live',
+                thumbnail: 'https://placehold.co/300x170/00FF00/FFFFFF?text=Comedy',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
                 description: 'Laugh out loud with the funniest stand-up comedians in this exclusive special.',
-                genre: 'Comedy',
-                type: 'movie',
-                isNew: false,
-                isPopular: true
+                genre: 'Comedy'
             },
             {
                 id: 'movie3',
-                title: 'Mystery of the Whispering Woods',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?mystery,forest,thriller',
-                videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4', // Another royalty-free video
+                title: 'Mystery of the Old House',
+                thumbnail: 'https://placehold.co/300x170/0000FF/FFFFFF?text=Mystery',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
                 description: 'A detective unravels the dark secrets hidden within an abandoned mansion.',
-                genre: 'Thriller',
-                type: 'movie',
-                isNew: true,
-                isPopular: false
+                genre: 'Thriller'
             },
             {
                 id: 'movie4',
-                title: 'Cosmic Odyssey: Journey to Kepler-186f',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?scifi,space,planet',
-                videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', // Another royalty-free video
+                title: 'Sci-Fi Odyssey',
+                thumbnail: 'https://placehold.co/300x170/FFFF00/000000?text=Sci-Fi',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
                 description: 'Explore distant galaxies and encounter alien civilizations in this stunning space opera.',
-                genre: 'Science Fiction',
-                type: 'movie',
-                isNew: false,
-                isPopular: true
+                genre: 'Science Fiction'
             },
             {
                 id: 'movie5',
-                title: 'Love in the Tuscan Sun',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?romance,italy,love',
-                videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4', // Another royalty-free video
+                title: 'Romantic Getaway',
+                thumbnail: 'https://placehold.co/300x170/FF00FF/FFFFFF?text=Romance',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
                 description: 'A heartwarming story of two strangers finding love in an unexpected paradise.',
-                genre: 'Romance',
-                type: 'movie',
-                isNew: true,
-                isPopular: false
+                genre: 'Romance'
             },
             {
                 id: 'movie6',
-                title: 'The Crown of Ages (Season 1)',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?historical,drama,king',
-                videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4', // Another royalty-free video
+                title: 'Historical Drama',
+                thumbnail: 'https://placehold.co/300x170/00FFFF/000000?text=Drama',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
                 description: 'Relive pivotal moments in history through the eyes of those who lived them.',
-                genre: 'Historical Drama',
-                type: 'tv_show',
-                isNew: true,
-                isPopular: true
+                genre: 'Drama'
             },
             {
                 id: 'movie7',
-                title: 'Adventures of Sparky the Dog',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?kids,cartoon,dog',
-                videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4', // Another royalty-free video
+                title: 'Kids Fun Time',
+                thumbnail: 'https://placehold.co/300x170/FFA500/FFFFFF?text=Kids',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
                 description: 'Animated adventures and educational content for the whole family.',
-                genre: 'Kids & Family',
-                type: 'tv_show',
-                isNew: false,
-                isPopular: true
+                genre: 'Kids & Family'
             },
             {
                 id: 'movie8',
-                title: 'Planet Earth: Deserts',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?documentary,nature,desert',
-                videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4', // Another royalty-free video
+                title: 'Documentary: Wild Earth',
+                thumbnail: 'https://placehold.co/300x170/800080/FFFFFF?text=Documentary',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
                 description: 'Discover the breathtaking beauty and fragile ecosystems of our planet.',
-                genre: 'Documentary',
-                type: 'movie',
-                isNew: true,
-                isPopular: false
+                genre: 'Documentary'
             },
             {
                 id: 'movie9',
-                title: 'The Last Dragon Rider',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?fantasy,dragon,magic',
-                videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4', // Another royalty-free video
+                title: 'Fantasy Realm',
+                thumbnail: 'https://placehold.co/300x170/4B0082/FFFFFF?text=Fantasy',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
                 description: 'Enter a world of magic, mythical creatures, and ancient prophecies.',
-                genre: 'Fantasy',
-                type: 'movie',
-                isNew: false,
-                isPopular: true
+                genre: 'Fantasy'
             },
             {
                 id: 'movie10',
-                title: 'The Haunting of Blackwood Manor',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?horror,haunted,ghost',
-                videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4', // Another royalty-free video
+                title: 'Horror Night',
+                thumbnail: 'https://placehold.co/300x170/8B0000/FFFFFF?text=Horror',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
                 description: 'A terrifying tale that will keep you on the edge of your seat.',
-                genre: 'Horror',
-                type: 'movie',
-                isNew: true,
-                isPopular: false
+                genre: 'Horror'
             },
             {
                 id: 'movie11',
-                title: 'Urban Chase',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?action,city,chase',
-                videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4', // Another royalty-free video
-                description: 'High-octane chases and intense action sequences through the city.',
-                genre: 'Action & Adventure',
-                type: 'movie',
-                isNew: false,
-                isPopular: true
+                title: 'Action Thriller',
+                thumbnail: 'https://placehold.co/300x170/FF4500/FFFFFF?text=Action',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+                description: 'High-octane chases and intense action sequences.',
+                genre: 'Action & Adventure'
             },
             {
                 id: 'movie12',
-                title: 'The Laugh Factory Showcase',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?comedy,laughter,show',
+                title: 'Stand-Up Special',
+                thumbnail: 'https://placehold.co/300x170/32CD32/FFFFFF?text=Comedy',
                 videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
                 description: 'A hilarious new comedy special from a rising star.',
-                genre: 'Comedy',
-                type: 'movie',
-                isNew: true,
-                isPopular: false
+                genre: 'Comedy'
             },
             {
                 id: 'movie13',
-                title: 'The Mind Game',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?psychological,mind,puzzle',
-                videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+                title: 'Psychological Thriller',
+                thumbnail: 'https://placehold.co/300x170/4169E1/FFFFFF?text=Thriller',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
                 description: 'Mind-bending twists and turns that will leave you questioning everything.',
-                genre: 'Thriller',
-                type: 'movie',
-                isNew: false,
-                isPopular: true
+                genre: 'Thriller'
             },
             {
                 id: 'movie14',
-                title: 'Beyond the Stars',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?galaxy,stars,exploration',
-                videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+                title: 'Space Exploration',
+                thumbnail: 'https://placehold.co/300x170/DAA520/000000?text=Space',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
                 description: 'Humanity\'s first mission to a distant exoplanet.',
-                genre: 'Science Fiction',
-                type: 'movie',
-                isNew: true,
-                isPopular: false
+                genre: 'Science Fiction'
             },
             {
                 id: 'movie15',
-                title: 'A Summer Fling',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?summer,beach,couple',
-                videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+                title: 'Sweet Romance',
+                thumbnail: 'https://placehold.co/300x170/FF69B4/FFFFFF?text=Love',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
                 description: 'A charming story about finding love in unexpected places.',
-                genre: 'Romance',
-                type: 'movie',
-                isNew: false,
-                isPopular: true
+                genre: 'Romance'
             },
             {
                 id: 'movie16',
-                title: 'The Inventor\'s Legacy',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?biography,invention,history',
-                videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+                title: 'Biographical Drama',
+                thumbnail: 'https://placehold.co/300x170/20B2AA/FFFFFF?text=Bio',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
                 description: 'The true story of an influential figure who changed the world.',
-                genre: 'Drama',
-                type: 'movie',
-                isNew: true,
-                isPopular: false
+                genre: 'Drama'
             },
             {
                 id: 'movie17',
-                title: 'Tiny Toons Adventures',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?cartoon,animals,kids',
-                videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
+                title: 'Animated Shorts',
+                thumbnail: 'https://placehold.co/300x170/ADFF2F/000000?text=Cartoons',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
                 description: 'A collection of delightful animated short films for all ages.',
-                genre: 'Kids & Family',
-                type: 'tv_show',
-                isNew: false,
-                isPopular: true
+                genre: 'Kids & Family'
             },
             {
                 id: 'movie18',
-                title: 'Ocean Deep: A Documentary',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?ocean,documentary,sea',
-                videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
+                title: 'Nature\'s Wonders',
+                thumbnail: 'https://placehold.co/300x170/5F9EA0/FFFFFF?text=Nature',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
                 description: 'An immersive look at the most incredible natural phenomena.',
-                genre: 'Documentary',
-                type: 'movie',
-                isNew: true,
-                isPopular: false
+                genre: 'Documentary'
             },
             {
                 id: 'movie19',
-                title: 'Chronicles of Eldoria',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?fantasy,medieval,castle',
-                videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4',
+                title: 'Epic Fantasy',
+                thumbnail: 'https://placehold.co/300x170/9932CC/FFFFFF?text=Magic',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
                 description: 'A grand adventure in a land filled with magic and ancient evils.',
-                genre: 'Fantasy',
-                type: 'movie',
-                isNew: false,
-                isPopular: true
+                genre: 'Fantasy'
             },
             {
                 id: 'movie20',
-                title: 'The Cursed Doll',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?horror,doll,scary',
-                videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
+                title: 'Supernatural Horror',
+                thumbnail: 'https://placehold.co/300x170/DC143C/FFFFFF?text=Spooky',
+                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
                 description: 'Unexplained occurrences terrorize a small town.',
-                genre: 'Horror',
-                type: 'movie',
-                isNew: true,
-                isPopular: false
-            },
-            // Adding more movies to ensure 4-5 per row in various categories
-            {
-                id: 'movie21',
-                title: 'Space Pirates',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?space,pirates,action',
-                videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4',
-                description: 'A rogue crew of space pirates embarks on a daring heist.',
-                genre: 'Action & Adventure',
-                type: 'movie',
-                isNew: true,
-                isPopular: true
-            },
-            {
-                id: 'movie22',
-                title: 'The Comedy Club',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?comedy,club,stage',
-                videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
-                description: 'An evening of hilarious sketches and improv.',
-                genre: 'Comedy',
-                type: 'movie',
-                isNew: false,
-                isPopular: true
-            },
-            {
-                id: 'movie23',
-                title: 'Silent Witness',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?mystery,crime,witness',
-                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
-                description: 'A thrilling crime mystery with unexpected twists.',
-                genre: 'Thriller',
-                type: 'movie',
-                isNew: true,
-                isPopular: false
-            },
-            {
-                id: 'movie24',
-                title: 'Robots Uprising',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?robots,future,dystopian',
-                videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-                description: 'In a dystopian future, robots rise against their creators.',
-                genre: 'Science Fiction',
-                type: 'movie',
-                isNew: false,
-                isPopular: true
-            },
-            {
-                id: 'movie25',
-                title: 'First Love, Last Dance',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?romance,dance,teen',
-                videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-                description: 'A nostalgic look back at first loves and unforgettable moments.',
-                genre: 'Romance',
-                type: 'movie',
-                isNew: true,
-                isPopular: false
-            },
-            {
-                id: 'movie26',
-                title: 'Ancient Empires (Season 2)',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?ancient,empire,history',
-                videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-                description: 'The continuing saga of powerful rulers and their kingdoms.',
-                genre: 'Historical Drama',
-                type: 'tv_show',
-                isNew: true,
-                isPopular: true
-            },
-            {
-                id: 'movie27',
-                title: 'The Magical Treehouse',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?treehouse,magic,kids',
-                videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
-                description: 'Two siblings discover a magical treehouse that takes them to new worlds.',
-                genre: 'Kids & Family',
-                type: 'tv_show',
-                isNew: false,
-                isPopular: true
-            },
-            {
-                id: 'movie28',
-                title: 'Wild Cities: Urban Wildlife',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?city,wildlife,documentary',
-                videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
-                description: 'An intriguing look at animals thriving in urban environments.',
-                genre: 'Documentary',
-                type: 'movie',
-                isNew: true,
-                isPopular: false
-            },
-            {
-                id: 'movie29',
-                title: 'The Sorcerer\'s Apprentice',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?sorcerer,magic,apprentice',
-                videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
-                description: 'A young apprentice learns the ways of magic from a powerful sorcerer.',
-                genre: 'Fantasy',
-                type: 'movie',
-                isNew: false,
-                isPopular: true
-            },
-            {
-                id: 'movie30',
-                title: 'Nightmare on Elm Street (Classic)',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?nightmare,street,horror',
-                videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4',
-                description: 'A classic horror film that defined a generation.',
-                genre: 'Horror',
-                type: 'movie',
-                isNew: true,
-                isPopular: false
-            },
-            {
-                id: 'movie31',
-                title: 'The Secret Agent',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?spy,agent,action',
-                videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
-                description: 'A top secret agent must stop a global conspiracy.',
-                genre: 'Action & Adventure',
-                type: 'movie',
-                isNew: false,
-                isPopular: true
-            },
-            {
-                id: 'movie32',
-                title: 'Comedy Gold',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?comedy,gold,funny',
-                videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4',
-                description: 'A compilation of the funniest moments from classic comedies.',
-                genre: 'Comedy',
-                type: 'movie',
-                isNew: true,
-                isPopular: false
-            },
-            {
-                id: 'movie33',
-                title: 'The Unseen Threat',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?threat,suspense,dark',
-                videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
-                description: 'A gripping thriller about an invisible danger.',
-                genre: 'Thriller',
-                type: 'movie',
-                isNew: false,
-                isPopular: true
-            },
-            {
-                id: 'movie34',
-                title: 'Interstellar Voyage',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?interstellar,voyage,space',
-                videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
-                description: 'A crew travels across the galaxy to find a new home.',
-                genre: 'Science Fiction',
-                type: 'movie',
-                isNew: true,
-                isPopular: false
-            },
-            {
-                id: 'movie35',
-                title: 'A Walk to Remember',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?walk,remember,romance',
-                videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-                description: 'A timeless story of love and loss.',
-                genre: 'Romance',
-                type: 'movie',
-                isNew: false,
-                isPopular: true
-            },
-            {
-                id: 'movie36',
-                title: 'The Queen\'s Gambit (Series)',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?chess,queen,drama',
-                videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-                description: 'A young chess prodigy rises to the top of the chess world.',
-                genre: 'Drama',
-                type: 'tv_show',
-                isNew: true,
-                isPopular: true
-            },
-            {
-                id: 'movie37',
-                title: 'Learning with Leo',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?learning,kids,education',
-                videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-                description: 'Educational adventures for curious young minds.',
-                genre: 'Kids & Family',
-                type: 'tv_show',
-                isNew: false,
-                isPopular: true
-            },
-            {
-                id: 'movie38',
-                title: 'The Human Body: Inside Out',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?human,body,documentary',
-                videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
-                description: 'A detailed exploration of the human anatomy and its functions.',
-                genre: 'Documentary',
-                type: 'movie',
-                isNew: true,
-                isPopular: false
-            },
-            {
-                id: 'movie39',
-                title: 'Realm of the Elves',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?elves,fantasy,forest',
-                videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
-                description: 'Journey into the mystical lands of the elves.',
-                genre: 'Fantasy',
-                type: 'movie',
-                isNew: false,
-                isPopular: true
-            },
-            {
-                id: 'movie40',
-                title: 'The Cabin in the Woods',
-                thumbnail: 'https://source.unsplash.com/random/300x170/?cabin,woods,horror',
-                videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
-                description: 'A group of friends face a terrifying ordeal in a remote cabin.',
-                genre: 'Horror',
-                type: 'movie',
-                isNew: true,
-                isPopular: false
+                genre: 'Horror'
             }
         ];
+
+        // Object to group movies by genre
+        const movieCategories = {};
+
+        // Distribute movies into categories
+        movies.forEach(movie => {
+            if (!movieCategories[movie.genre]) {
+                movieCategories[movie.genre] = [];
+            }
+            movieCategories[movie.genre].push(movie);
+        });
 
         // Get DOM elements
         const movieListingContainer = document.getElementById('movie-listings');
@@ -804,58 +353,16 @@
         const videoModal = document.getElementById('videoModal');
         const modalMovieTitle = document.getElementById('modal-movie-title');
         const moviePlayer = document.getElementById('movie-player');
-        const authModal = document.getElementById('authModal');
-        const authEmailInput = document.getElementById('auth-email');
-        const authPasswordInput = document.getElementById('auth-password');
-        const messageBox = document.getElementById('messageBox');
-        const messageText = document.getElementById('messageText');
-
-        let currentFilter = 'all'; // 'all', 'tv_show', 'movie', 'new_popular', 'mylist'
 
         /**
-         * Displays a custom message box.
-         * @param {string} message - The message to display.
+         * Renders movie listings on the page, grouped by genre.
+         * Can filter movies based on a search term.
+         * @param {Array} filteredMovies - The array of movies to render. Defaults to all movies.
          */
-        function showMessageBox(message) {
-            messageText.textContent = message;
-            messageBox.style.display = 'block';
-        }
-
-        /**
-         * Closes the custom message box.
-         */
-        function closeMessageBox() {
-            messageBox.style.display = 'none';
-        }
-
-        /**
-         * Renders movie listings into the main container, filtered by type and search term.
-         * @param {string} filterType - 'all', 'movie', 'tv_show', 'new_popular', 'mylist'.
-         * @param {string} searchTerm - Optional search term to filter by.
-         */
-        function renderMovies(filterType, searchTerm = '') {
+        function renderMovies(filteredMovies = movies) {
             movieListingContainer.innerHTML = ''; // Clear previous listings
 
-            let filteredMovies = movies.filter(movie =>
-                movie.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                movie.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                movie.genre.toLowerCase().includes(searchTerm.toLowerCase())
-            );
-
-            // Apply navigation filter
-            if (filterType === 'tv_show') {
-                filteredMovies = filteredMovies.filter(movie => movie.type === 'tv_show');
-            } else if (filterType === 'movie') {
-                filteredMovies = filteredMovies.filter(movie => movie.type === 'movie');
-            } else if (filterType === 'new_popular') {
-                filteredMovies = filteredMovies.filter(movie => movie.isNew || movie.isPopular);
-            } else if (filterType === 'mylist') {
-                // Placeholder for 'My List' - in a real app, you'd fetch from user's Firestore data
-                showMessageBox("My List feature is not yet fully implemented. Please sign in to save your favorites!");
-                filteredMovies = []; // For now, show nothing in My List
-            }
-
-            // Group by genre for display
+            // Create a temporary object to hold movies by category for the current render
             const categoriesToRender = {};
             filteredMovies.forEach(movie => {
                 if (!categoriesToRender[movie.genre]) {
@@ -868,22 +375,17 @@
             for (const genre in categoriesToRender) {
                 if (categoriesToRender[genre].length > 0) {
                     const categorySection = document.createElement('div');
-                    categorySection.className = 'mb-8';
+                    categorySection.className = 'mb-8'; // Margin bottom for spacing between categories
                     categorySection.innerHTML = `
                         <h3 class="text-2xl md:text-3xl font-bold mb-4 text-white">${genre}</h3>
                         <div class="flex overflow-x-auto space-x-4 pb-4 scroll-container">
                             ${categoriesToRender[genre].map(movie => `
-                                <div class="movie-card flex-none w-48 md:w-56 bg-gray-800 rounded-lg shadow-lg overflow-hidden cursor-pointer transform hover:scale-105 transition duration-300 relative">
+                                <div class="flex-none w-48 md:w-56 bg-gray-800 rounded-lg shadow-lg overflow-hidden cursor-pointer transform hover:scale-105 transition duration-300" onclick="playMovie('${movie.id}')">
                                     <img src="${movie.thumbnail}" alt="${movie.title}" class="w-full h-auto object-cover rounded-t-lg">
-                                    <div class="movie-card-content p-3">
+                                    <div class="p-3">
                                         <h4 class="text-lg font-semibold text-white truncate">${movie.title}</h4>
                                         <p class="text-sm text-gray-400 mt-1">${movie.description.substring(0, 50)}...</p>
-                                        <button class="mt-3 bg-red-600 hover:bg-red-700 text-white text-sm font-bold py-1.5 px-3 rounded-md w-full transition duration-300" onclick="playMovie('${movie.id}')">Play</button>
-                                    </div>
-                                    <div class="movie-details-overlay text-white">
-                                        <h4>${movie.title}</h4>
-                                        <p>${movie.description}</p>
-                                        <button class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full transition duration-300" onclick="playMovie('${movie.id}')">Play</button>
+                                        <button class="mt-3 bg-red-600 hover:bg-red-700 text-white text-sm font-bold py-1.5 px-3 rounded-md w-full transition duration-300">Play</button>
                                     </div>
                                 </div>
                             `).join('')}
@@ -893,23 +395,28 @@
                 }
             }
 
-            if (filteredMovies.length === 0 && searchTerm !== '') {
-                movieListingContainer.innerHTML = '<p class="text-center text-gray-400 text-xl">No content found matching your search criteria.</p>';
-            } else if (filteredMovies.length === 0 && searchTerm === '' && filterType !== 'mylist') {
-                 movieListingContainer.innerHTML = '<p class="text-center text-gray-400 text-xl">No content available in this category.</p>';
+            // Display message if no movies are found after filtering
+            if (filteredMovies.length === 0) {
+                movieListingContainer.innerHTML = '<p class="text-center text-gray-400 text-xl">No movies found matching your search criteria.</p>';
             }
         }
 
         // Event listener for search input
         searchInput.addEventListener('keyup', (event) => {
-            renderMovies(currentFilter, event.target.value);
+            const searchTerm = event.target.value.toLowerCase();
+            const filteredMovies = movies.filter(movie =>
+                movie.title.toLowerCase().includes(searchTerm) ||
+                movie.description.toLowerCase().includes(searchTerm) ||
+                movie.genre.toLowerCase().includes(searchTerm)
+            );
+            renderMovies(filteredMovies); // Re-render movies based on search term
         });
 
         /**
          * Opens the video modal and plays the selected movie.
          * @param {string} movieId - The ID of the movie to play.
          */
-        window.playMovie = function(movieId) { // Made global for onclick in HTML
+        function playMovie(movieId) {
             const movie = movies.find(m => m.id === movieId);
             if (movie) {
                 modalMovieTitle.textContent = movie.title;
@@ -919,14 +426,14 @@
                 moviePlayer.play(); // Autoplay the video
             } else {
                 console.error('Movie not found with ID:', movieId);
-                showMessageBox('Error: Movie not found. Please try again.');
+                // In a real application, you might display a user-friendly error message here.
             }
         }
 
         /**
          * Closes the video modal and pauses the video.
          */
-        window.closeModal = function() { // Made global for onclick in HTML
+        function closeModal() {
             moviePlayer.pause(); // Pause the video
             videoModal.style.display = 'none'; // Hide the modal
         }
@@ -936,119 +443,11 @@
             if (event.target == videoModal) {
                 closeModal();
             }
-            if (event.target == authModal) {
-                closeAuthModal();
-            }
         }
-
-        // --- Authentication Functions ---
-
-        /**
-         * Opens the authentication modal.
-         */
-        window.openAuthModal = function() {
-            authModal.style.display = 'flex';
-            authEmailInput.value = '';
-            authPasswordInput.value = '';
-        }
-
-        /**
-         * Closes the authentication modal.
-         */
-        window.closeAuthModal = function() {
-            authModal.style.display = 'none';
-        }
-
-        /**
-         * Handles user sign-up with email and password.
-         */
-        window.signUpWithEmail = async function() {
-            if (!auth) { showMessageBox("Authentication not configured."); return; }
-            const email = authEmailInput.value;
-            const password = authPasswordInput.value;
-            if (!email || !password) {
-                showMessageBox("Please enter both email and password for sign up.");
-                return;
-            }
-            try {
-                await createUserWithEmailAndPassword(auth, email, password);
-                showMessageBox("Sign up successful! You are now logged in.");
-                closeAuthModal();
-            } catch (error) {
-                console.error("Sign up error:", error);
-                showMessageBox(`Sign Up Failed: ${error.message}`);
-            }
-        }
-
-        /**
-         * Handles user sign-in with email and password.
-         */
-        window.signInWithEmail = async function() {
-            if (!auth) { showMessageBox("Authentication not configured."); return; }
-            const email = authEmailInput.value;
-            const password = authPasswordInput.value;
-            if (!email || !password) {
-                showMessageBox("Please enter both email and password for sign in.");
-                return;
-            }
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-                showMessageBox("Sign in successful!");
-                closeAuthModal();
-            } catch (error) {
-                console.error("Sign in error:", error);
-                showMessageBox(`Sign In Failed: ${error.message}`);
-            }
-        }
-
-        /**
-         * Handles anonymous user sign-in.
-         */
-        window.signInAnonymouslyUser = async function() {
-            if (!auth) { showMessageBox("Authentication not configured."); return; }
-            try {
-                await signInAnonymously(auth);
-                showMessageBox("Signed in as Guest!");
-                closeAuthModal();
-            } catch (error) {
-                console.error("Anonymous sign-in error:", error);
-                showMessageBox(`Guest Sign In Failed: ${error.message}`);
-            }
-        }
-
-        /**
-         * Handles user sign-out.
-         */
-        window.signOutUser = async function() {
-            if (!auth) { showMessageBox("Authentication not configured."); return; }
-            try {
-                await signOut(auth);
-                showMessageBox("You have been signed out.");
-            } catch (error) {
-                console.error("Sign out error:", error);
-                showMessageBox(`Sign Out Failed: ${error.message}`);
-            }
-        }
-
-        // --- Navigation Tab Functionality (now filters on single page) ---
-        const navLinks = document.querySelectorAll('nav a');
-
-        navLinks.forEach(link => {
-            link.addEventListener('click', (event) => {
-                event.preventDefault(); // Prevent default link behavior
-                // Remove active class from all links
-                navLinks.forEach(l => l.classList.remove('active-nav'));
-                // Add active class to clicked link
-                event.target.classList.add('active-nav');
-
-                currentFilter = event.target.dataset.filterType; // Get filter type from data attribute
-                renderMovies(currentFilter, searchInput.value); // Re-render movies based on new filter and current search
-            });
-        });
 
         // Initial render of movies when the DOM is fully loaded
         document.addEventListener('DOMContentLoaded', () => {
-            renderMovies('all'); // Render all movies initially on the single page
+            renderMovies();
         });
     </script>
 </body>
